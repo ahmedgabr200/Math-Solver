@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bayes & Linear Regression Solver</title>
+    <link rel="stylesheet" href="styles/style.css">
+</head>
+<body>
+    <header>
+        <h1>Bayes & Linear Regression Solver</h1>
+    </header>
+
+    <main>
+        <!-- Training Data -->
+        <section>
+            <h2>Input Training Data</h2>
+            <table id="input-table">
+                <thead>
+                    <tr>
+                        <th>Feature 1</th>
+                        <th>Feature 2</th>
+                        <th>Feature 3</th>
+                        <th>Class/Output (Y)</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><input type="number"></td>
+                        <td><input type="number"></td>
+                        <td><input type="number"></td>
+                        <td><input type="number"></td>
+                    </tr>
+                </tbody>
+            </table>
+            <button id="add-row">Add Row</button>
+        </section>
+
+        <!-- User Input for Prediction -->
+        <section>
+            <h2>Input Values for Prediction</h2>
+            <label>Choose Algorithm:</label>
+            <select id="algorithm">
+                <option value="naive">Naive Bayes</option>
+                <option value="gaussian">Gaussian Naive Bayes</option>
+                <option value="linear">Linear Regression</option>
+            </select>
+
+            <div id="feature-input">
+                <label>Enter Features (Comma Separated):</label>
+                <input type="text" id="feature-values" placeholder="Example: 1,0,0">
+            </div>
+
+            <div id="std-dev-input" style="display: none;">
+                <label>Standard Deviation (Gaussian):</label>
+                <input type="number" id="std-dev" value="5">
+            </div>
+
+            <button id="predict-btn">Predict</button>
+        </section>
+
+        <!-- Results -->
+        <section>
+            <h2>Prediction Results</h2>
+            <pre id="results"></pre>
+        </section>
+    </main>
+
+    <script src="scripts/naive_bayes.js"></script>
+    <script src="scripts/gaussian_nb.js"></script>
+    <script src="scripts/linear_regression.js"></script>
+    <script>
+        document.getElementById("add-row").addEventListener("click", () => {
+            const row = document.createElement("tr");
+            row.innerHTML = `
+                <td><input type="number"></td>
+                <td><input type="number"></td>
+                <td><input type="number"></td>
+                <td><input type="number"></td>
+            `;
+            document.querySelector("#input-table tbody").appendChild(row);
+        });
+
+        document.getElementById("algorithm").addEventListener("change", () => {
+            const algorithm = document.getElementById("algorithm").value;
+            document.getElementById("std-dev-input").style.display = algorithm === "gaussian" ? "block" : "none";
+        });
+
+        document.getElementById("predict-btn").addEventListener("click", () => {
+            const rows = document.querySelectorAll("#input-table tbody tr");
+            const data = Array.from(rows).map(row => {
+                return Array.from(row.querySelectorAll("input")).map(input => Number(input.value));
+            });
+
+            const algorithm = document.getElementById("algorithm").value;
+            const featureValues = document.getElementById("feature-values").value.split(",").map(Number);
+            const stdDev = Number(document.getElementById("std-dev").value);
+            const resultsContainer = document.getElementById("results");
+
+            if (algorithm === "naive") {
+                resultsContainer.textContent = naiveBayesPredict(data, featureValues);
+            } else if (algorithm === "gaussian") {
+                resultsContainer.textContent = gaussianNaiveBayes(data, featureValues, stdDev);
+            } else if (algorithm === "linear") {
+                resultsContainer.textContent = linearRegressionPredict(data, featureValues[0]);
+            }
+        });
+    </script>
+</body>
+</html>
